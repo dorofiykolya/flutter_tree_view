@@ -1,3 +1,7 @@
+## [0.6.0] 5-09-2022
+- TreeNode, add insertChild
+  - Author: @dorofiykolya (https://github.com/dorofiykolya)
+  
 ## [0.5.3+1] 12-08-2022
 - Fix rtl line painting bug
   - Author: @naory159 (https://github.com/naory159)

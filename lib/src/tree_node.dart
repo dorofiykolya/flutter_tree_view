@@ -1,4 +1,4 @@
-import 'dart:collection' show UnmodifiableSetView;
+import 'dart:collection' show UnmodifiableListView;
 
 import 'package:flutter/material.dart';
 
@@ -41,10 +41,11 @@ class TreeNode extends Comparable<TreeNode> {
 
   // * ~~~~~~~~~~ CHILDREN RELATED ~~~~~~~~~~ *
 
-  final Set<TreeNode> _children = {};
+  final List<TreeNode> _children = [];
+  final Set<TreeNode> _childrenSet = {};
 
   /// The list of child nodes.
-  UnmodifiableSetView<TreeNode> get children => UnmodifiableSetView(_children);
+  UnmodifiableListView<TreeNode> get children => UnmodifiableListView(_children);
 
   /// Whether this node has children or not.
   bool get hasChildren => _children.isNotEmpty;
@@ -84,22 +85,42 @@ class TreeNode extends Comparable<TreeNode> {
   void addChild(TreeNode child) {
     // A node can't be neither child of its children nor parent of itself.
     if (child == parent || child == this) return;
+    if (_childrenSet.contains(child)) return;
 
     child.parent?.removeChild(child);
 
     child._parent = this;
 
     _children.add(child);
+    _childrenSet.add(child);
   }
+
+  /// Inserts a single child to this node at the index
+  void insertChild(int index, TreeNode child) {
+    // A node can't be neither child of its children nor parent of itself.
+    if (child == parent || child == this) return;
+    if (_childrenSet.contains(child)) return;
+
+    child.parent?.removeChild(child);
+
+    child._parent = this;
+
+    _children.insert(index, child);
+    _childrenSet.add(child);
+  }
+
+  /// Gets child index
+  int indexOf(TreeNode child) => _children.indexOf(child);
 
   /// Adds a list of children to this node.
   void addChildren(Iterable<TreeNode> nodes) => nodes.forEach(addChild);
 
   /// Removes a single child from this node and set its parent to `null`.
   void removeChild(TreeNode child) {
-    final wasRemoved = _children.remove(child);
+    final wasRemoved = _childrenSet.remove(child);
 
     if (wasRemoved) {
+      _children.remove(child);
       child._parent = null;
     }
   }
@@ -151,6 +172,7 @@ class TreeNode extends Comparable<TreeNode> {
     }).toList(growable: false);
 
     _children.clear();
+    _childrenSet.clear();
     return _removedChildren;
   }
 
